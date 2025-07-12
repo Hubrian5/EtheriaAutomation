@@ -64,21 +64,54 @@ def move_mouse_smoothly(x, y, duration=MOVE_DURATION, steps=MOVE_STEPS):
 
     win32api.SetCursorPos((x, y))  # Ensure final position
 
+def move_mouse_human_like(target_x, target_y, duration_range=(0.4, 0.9), steps_range=(15, 30), arc_strength=10, vertical=True):
+    current_x, current_y = win32api.GetCursorPos()
+
+    steps = random.randint(*steps_range)
+    duration = random.uniform(*duration_range)
+    delay = duration / steps
+
+    for i in range(steps + 1):
+        t = i / steps
+        ease = t**2 * (3 - 2 * t)  # smoothstep easing
+
+        # Interpolated position
+        x = int(current_x + (target_x - current_x) * ease)
+        y = int(current_y + (target_y - current_y) * ease)
+
+        arc_offset = int(arc_strength * np.sin(t * np.pi))
+        if vertical:
+            y += arc_offset
+        else:
+            x += arc_offset
+
+        win32api.SetCursorPos((x, y))
+        time.sleep(delay)
+
+
 def native_click(x, y):
     screen_width, screen_height = get_screen_size()
+
+    # Add a small random offset to the click point
+    x += random.randint(-3, 3)
+    y += random.randint(-3, 3)
 
     x = max(0, min(x, screen_width - 1))
     y = max(0, min(y, screen_height - 1))
 
-    print(f"[INFO] Moving to click at: ({x}, {y})")
+    print(f"[HUMAN] Moving and clicking at: ({x}, {y})")
 
     try:
-        move_mouse_smoothly(x, y)
-        time.sleep(0.05)
+        move_mouse_human_like(x, y)
+        time.sleep(random.uniform(0.05, 0.15))  # reaction delay
+
+        # Simulate realistic press length
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
+        time.sleep(random.uniform(0.06, 0.18))  # click held down
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
     except Exception as e:
-        print(f"[ERROR] Failed to click at ({x}, {y}): {e}")
+        print(f"[ERROR] Failed to human-click at ({x}, {y}): {e}")
+
 
 def locate_and_click_button(window, template_path, label=""):
     with mss.mss() as sct:
