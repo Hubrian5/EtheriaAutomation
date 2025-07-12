@@ -8,3 +8,5 @@ How to Use:
 - Run the script in cmd with admin permissions
 
 Ctrl+c to terminate the script.
+
+Potentially bannable and I take no responsibility.
