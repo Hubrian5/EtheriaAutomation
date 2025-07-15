@@ -41,7 +41,7 @@ def bring_etheria_to_foreground():
         time.sleep(0.5)
 
         if etheria_window.left < 0 or etheria_window.top < 0:
-            etheria_window.moveTo(100, 100)
+            etheria_window.moveTo(0, 0)
 
         return etheria_window
 
